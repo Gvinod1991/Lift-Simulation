@@ -1,0 +1,62 @@
+.moving {
+  z-index: 1000;
+}
+
+/**
+Door Animation CSS
+*/
+
+.lift.slide .door-left {
+  left: -50%;
+}
+
+.lift.slide .door-right {
+  left: 100%;
+}
+
+.lift {
+  position: relative;
+  overflow: hidden;
+  display: block;
+}
+
+.lift.slide {
+  overflow: hidden;
+}
+
+.door-left,
+.door-right {
+  position: absolute;
+  z-index: 1;
+  height: 100%;
+  width: 50%;
+  top: 0%;
+  transition: left ease 2.5s;
+  -moz-transition: left ease 2.5s;
+  -webkit-transition: left ease 2.5s;
+  -o-transition: left ease 2.5s;
+  -ms-transition: left ease 2.5s;
+}
+
+.door-left {
+  left: 0%;
+  background-color: #e5d3d3;
+  border-right: 1px solid #6b7280;
+  z-index: 0;
+}
+
+.door-right {
+  left: 50%;
+  background-color: #e5d3d3;
+  z-index: 0;
+}
+
+.lift.slide .door-left {
+  left: -50%;
+  transition: left ease 2.5s;
+}
+
+.lift.slide .door-right {
+  left: 100%;
+  transition: left ease 2.5s;
+}
