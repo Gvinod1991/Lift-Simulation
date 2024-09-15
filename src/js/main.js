@@ -72,6 +72,7 @@ Queue concept to be implemented
 /**
  * Someting creative i need to comeup with 1 Floor and 1 Lift
  */
+
 const STATUS = {
   IDLE: "IDLE",
   MOVING: "MOVING",
@@ -79,6 +80,10 @@ const STATUS = {
 const DIRECTION = {
   UP: "UP",
   DOWN: "DOWN",
+};
+const errorIds = {
+  noOfFloors: "no-of-floors-error",
+  noOfLifts: "no-of-lifts-error",
 };
 const buildingWrapper = document.getElementById("lifts-wrapper");
 const submitForm = document.getElementById("submit-form");
@@ -136,8 +141,8 @@ function renderFloor(floorObj, lifts) {
     "border-b-2",
     "border-black",
     "w-full",
-    "h-20",
-    "col-span-10"
+    "h-24",
+    "col-span-11"
   );
   const liftWrapper = document.createElement("div");
   liftWrapper.id = floorObj.floorName;
@@ -150,7 +155,7 @@ function renderFloor(floorObj, lifts) {
 }
 function renderFloorName(floorName) {
   const floorLabel = document.createElement("label");
-  floorLabel.classList.add("col-span-1", "mt-auto");
+  floorLabel.classList.add("col-span-1", "mt-auto", "text-center");
   floorLabel.innerText = floorName;
   return floorLabel;
 }
@@ -160,9 +165,18 @@ function renderBuildingAndLifts(floors, lifts) {
   const building = document.createElement("div");
   building.classList.add("grid", "grid-cols-12", "gap-4", "mt-4");
   floors.forEach((floor) => {
-    building.appendChild(renderLiftControl(floor, floors.length));
+    const florNameAndControl = document.createElement("div");
+    florNameAndControl.classList.add(
+      "flex",
+      "flex-col",
+      "items-center",
+      "justify-start",
+      "-mt-2"
+    );
+    florNameAndControl.appendChild(renderFloorName(floor.floorName));
+    florNameAndControl.appendChild(renderLiftControl(floor, floors.length));
+    building.appendChild(florNameAndControl);
     building.appendChild(renderFloor(floor, lifts));
-    building.appendChild(renderFloorName(floor.floorName));
   });
   buildingWrapper.appendChild(building);
   const renderedLifts = liftController.getLifts();
@@ -191,7 +205,7 @@ function renderLifts(lifts, liftWrapper) {
     liftElement.classList.add(
       "bg-gray-500",
       "w-16",
-      "h-20",
+      "h-24",
       "rounded-sm",
       "border-2",
       "border-gray-500",
@@ -205,11 +219,24 @@ function renderLifts(lifts, liftWrapper) {
 
 submitForm.addEventListener("submit", function (e) {
   e.preventDefault();
+  Object.entries(errorIds).map(([key, value]) => {
+    document.getElementById(value).innerText = "";
+  });
   const noOfFloorsElement = document.getElementById("no-of-floors");
   const noOfLiftsElement = document.getElementById("no-of-lifts");
   const noOfFloors = noOfFloorsElement.value;
   const noOfLifts = noOfLiftsElement.value;
-  liftController.renderBuilding(noOfFloors, noOfLifts);
+  const { isFormValid, errors } = validateForm({ noOfFloors, noOfLifts });
+  if (Object.keys(errors).length > 0) {
+    //render errors
+    Object.entries(errors).map(([key, value]) => {
+      document.getElementById(errorIds[key]).innerText = value;
+    });
+    return false;
+  }
+  if (isFormValid) {
+    liftController.renderBuilding(noOfFloors, noOfLifts);
+  }
 });
 
 function renderLiftMovement({
@@ -217,7 +244,6 @@ function renderLiftMovement({
   toFloor,
   fromFloorName,
   toFloorName,
-  direction,
   liftNo,
   openLiftDoors,
 }) {
@@ -244,19 +270,17 @@ function renderLiftMovement({
   const deltaY = destinationRect.top - sourceRect.top;
   const deltaX = destinationRect.left - sourceRect.left;
   movingLift.addEventListener("transitionend", (e) => {
-    // Optionally, you can do something like swap content or hide the source
     movingLift.classList.remove("moving");
     movingLift.style = "";
     movingLift.style.position = "absolute";
     movingLift.style.left = `${movingLiftRect.left}px`;
     destination.appendChild(movingLift);
     if (e.propertyName === "transform") {
-      openLiftDoors(toFloor);
+      openLiftDoors();
     }
   });
   // Trigger the animation using CSS transform
   requestAnimationFrame(() => {
-    //movingLift.style.left = leftPosition;
     movingLift.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
     movingLift.style.transitionDuration = `${Math.abs(timeRequiredToReach)}s`;
   });
@@ -273,6 +297,7 @@ class Lift {
     const fromFloor = this.floor;
     const toFloor = floor;
     this.direction = direction;
+    this.floor = floor;
     this.status = STATUS.MOVING;
     if (fromFloor !== toFloor) {
       this.renderMove({
@@ -283,12 +308,11 @@ class Lift {
         openLiftDoors: this.open.bind(this),
       });
     } else {
-      this.open(floor);
+      this.open();
     }
   }
-  open(floor) {
-    console.log("Opening the door", floor);
-    this.floor = floor;
+  open() {
+    console.log("Opening the door");
     setTimeout(() => {
       document.getElementById(this.liftNo).classList.add("slide");
     }, 0);
@@ -296,6 +320,7 @@ class Lift {
   }
   close() {
     const lift = document.getElementById(this.liftNo);
+    //Close the door after 2.5 secs
     setTimeout(() => {
       lift.classList.remove("slide");
     }, 2500);
@@ -313,7 +338,6 @@ class Lift {
       toFloor,
       fromFloorName,
       toFloorName,
-      direction,
       liftNo,
       openLiftDoors,
     });
@@ -355,11 +379,31 @@ class LiftController {
     renderBuildingAndLifts(this.floors, this.lifts);
   }
   getAvailableLift(floorNumber, direction) {
-    return this.lifts.find((lift, i) => {
-      if (lift.status === STATUS.IDLE && lift.direction === direction) {
-        return lift;
+    const movingLiftToSameFloor = this.lifts.find(
+      (lift) =>
+        lift.status === STATUS.MOVING &&
+        lift.direction === direction &&
+        lift.floor === floorNumber
+    );
+    if (movingLiftToSameFloor) {
+      return null;
+    }
+    const floorDistance = [];
+    this.lifts.forEach((lift) => {
+      if (lift.status === STATUS.IDLE) {
+        floorDistance.push({
+          distance: Math.abs(floorNumber - lift.floor),
+          lift,
+        });
       }
     });
+    const sortedLifts = floorDistance.sort(
+      (lift1, lift2) => lift1.distance - lift2.distance
+    );
+    if (sortedLifts.length > 0) {
+      return sortedLifts[0].lift;
+    }
+    return null;
   }
   liftRequest(floorNumber, direction) {
     const lift = this.getAvailableLift(floorNumber, direction);
@@ -368,4 +412,3 @@ class LiftController {
 }
 
 const liftController = new LiftController();
-//liftController.getLifts();
