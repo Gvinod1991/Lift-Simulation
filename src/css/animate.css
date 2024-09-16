@@ -18,6 +18,7 @@ Door Animation CSS
   position: relative;
   overflow: hidden;
   display: block;
+  margin-top: -0.25rem
 }
 
 .lift.slide {

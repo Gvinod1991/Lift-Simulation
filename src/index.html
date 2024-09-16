@@ -13,20 +13,24 @@
 
 <body class="bg-indigo-100 mt-5">
   <form id="submit-form">
-    <div class="flex flex-col md:flex-row justify-center gap-2">
-      <div>
+    <div class="flex flex-col md:flex-row lg:justify-center gap-2">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-2">
         <label class="text-xl text-left">No of Floors</label>
-        <input type="number" id="no-of-floors" name="no-of-floors" required
-          class="border-2 p-2 border-gray-600 rounded-lg" />
-        <p id="no-of-floors-error" class="text-red-500"></p>
+        <div>
+          <input type="number" id="no-of-floors" name="no-of-floors" required
+            class="border-2 p-2 border-gray-600 rounded-lg" />
+          <p id="no-of-floors-error" class="text-red-500"></p>
+        </div>
       </div>
-      <div>
+      <div class="flex flex-col md:flex-row justify-between items-center gap-2">
         <label class="text-xl text-left">No of Lifts</label>
-        <input type="number" id="no-of-lifts" name="no-of-lifts" required
-          class="border-2 p-2 border-gray-600 rounded-lg" />
-        <p id="no-of-lifts-error" class="text-red-500"></p>
+        <div>
+          <input type="number" id="no-of-lifts" name="no-of-lifts" required
+            class="border-2 p-2 border-gray-600 rounded-lg" />
+          <p id="no-of-lifts-error" class="text-red-500"></p>
+        </div>
       </div>
-      <div class="ml-2">
+      <div class="m-auto md:m-0 md:ml-2">
         <button type="submit" id="submit-btn"
           class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Submit</button>
         <p class="text-red-500"></p>

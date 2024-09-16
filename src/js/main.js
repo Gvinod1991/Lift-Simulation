@@ -139,14 +139,14 @@ function renderFloor(floorObj, lifts) {
   const floor = document.createElement("div");
   floor.classList.add(
     "border-b-2",
+    "w-9/12",
+    "md:w-11/12",
     "border-black",
-    "w-full",
-    "h-24",
-    "col-span-11"
+    "h-24"
   );
   const liftWrapper = document.createElement("div");
   liftWrapper.id = floorObj.floorName;
-  liftWrapper.classList.add("flex", "gap-2", "pb-2", "-m-1");
+  liftWrapper.classList.add("flex", "w-min", "gap-2", "pb-2");
   //If only one floor no lifts required
   floorObj.floorNumber === 1
     ? floor.appendChild(renderLifts(lifts, liftWrapper))
@@ -155,30 +155,34 @@ function renderFloor(floorObj, lifts) {
 }
 function renderFloorName(floorName) {
   const floorLabel = document.createElement("label");
-  floorLabel.classList.add("col-span-1", "mt-auto", "text-center");
+  floorLabel.classList.add("mt-auto", "text-center");
   floorLabel.innerText = floorName;
   return floorLabel;
 }
 
 function renderBuildingAndLifts(floors, lifts) {
   buildingWrapper.innerHTML = null;
-  const building = document.createElement("div");
-  building.classList.add("grid", "grid-cols-12", "gap-4", "mt-4");
+
   floors.forEach((floor) => {
+    const building = document.createElement("div");
+    building.classList.add("flex", "mt-4");
     const florNameAndControl = document.createElement("div");
     florNameAndControl.classList.add(
       "flex",
       "flex-col",
       "items-center",
       "justify-start",
-      "-mt-2"
+      "-mt-2",
+      "w-3/12",
+      "md:w-1/12"
     );
     florNameAndControl.appendChild(renderFloorName(floor.floorName));
     florNameAndControl.appendChild(renderLiftControl(floor, floors.length));
     building.appendChild(florNameAndControl);
     building.appendChild(renderFloor(floor, lifts));
+    buildingWrapper.appendChild(building);
   });
-  buildingWrapper.appendChild(building);
+
   const renderedLifts = liftController.getLifts();
   //To make lifts persistent in same position
   renderedLifts.forEach((lift) => {
@@ -383,7 +387,8 @@ class LiftController {
       (lift) =>
         lift.status === STATUS.MOVING &&
         lift.direction === direction &&
-        lift.floor === floorNumber
+        lift.floor === floorNumber &&
+        lift.floor !== 1
     );
     if (movingLiftToSameFloor) {
       return null;
