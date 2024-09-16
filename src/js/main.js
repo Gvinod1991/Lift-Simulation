@@ -88,7 +88,7 @@ const errorIds = {
 const buildingWrapper = document.getElementById("lifts-wrapper");
 const submitForm = document.getElementById("submit-form");
 const btnClassList = [
-  "text-white",
+  "text-center",
   "bg-gradient-to-br",
   "from-purple-600",
   "to-blue-500",
@@ -99,29 +99,29 @@ const btnClassList = [
   "dark:focus:ring-blue-800",
   "font-medium",
   "rounded-lg",
-  "text-sm",
-  "px-5",
-  "py-2.5",
-  "text-center",
   "mb-1",
 ];
 function renderLiftControl(floorObj, noOfFloors) {
   const liftControlElement = document.createElement("div");
   liftControlElement.classList.add(
-    "col-span-1",
     "flex",
     "justify-center",
     "flex-col",
-    "ml-1",
-    "mb-1"
+    "ml-4",
+    "mb-1",
+    "mr-4"
   );
-  if (floorObj.floorNumber !== noOfFloors) {
+  if (Number(floorObj.floorNumber) !== Number(noOfFloors)) {
     const upBtn = document.createElement("button");
     upBtn.addEventListener("click", function () {
       liftController.liftRequest(floorObj.floorNumber, DIRECTION.UP);
     });
     upBtn.classList.add(...btnClassList);
-    upBtn.innerText = "UP";
+    const imgElement = document.createElement("img");
+    imgElement.classList.add("w-1/2", "rotate-180", "m-auto");
+    imgElement.src = "/src/img/down-chevron.svg";
+    imgElement.alt = "Up arrow";
+    upBtn.appendChild(imgElement);
     liftControlElement.append(upBtn);
   }
   if (floorObj.floorNumber !== 1) {
@@ -130,7 +130,11 @@ function renderLiftControl(floorObj, noOfFloors) {
       liftController.liftRequest(floorObj.floorNumber, DIRECTION.DOWN);
     });
     downBtn.classList.add(...btnClassList);
-    downBtn.innerText = "DOWN";
+    const imgElement = document.createElement("img");
+    imgElement.classList.add("w-1/2", "m-auto");
+    imgElement.src = "/src/img/down-chevron.svg";
+    imgElement.alt = "Down arrow";
+    downBtn.appendChild(imgElement);
     liftControlElement.append(downBtn);
   }
   return liftControlElement;
