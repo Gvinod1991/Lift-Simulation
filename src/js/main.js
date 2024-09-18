@@ -1,78 +1,3 @@
-/*
-LiftNo-1
-from 1 to 3
-3-1 = 2 * 2 = 4 seconds
-
-*/
-
-/**
- * LiftNO-1
- * is at FloorNo3
- */
-
-/**
- * In case of multiple lifts , which lift should be chosen
- * What is the lift choosing criteria
- *
- */
-
-/**
- * LIFT1 is at FLOOR2
- *
- * LIFT2 is at FLOOR4
- *
- * LIFT3 is at FLOOR3
- */
-
-/**
- * When lift is running then idle lifts should be chosen
- * When no lifts are running first lift to be chosen
- * When
- */
-/**
- * The Main Components
-Our elevator system will consist of the following components:
-
-Elevator: The core class representing the elevator.
-Request: A class to encapsulate an elevator request.
-Controller: Manages the elevators and assigns requests to them.
-
-Elevator Class
-The Elevator class represents a single elevator. Its key responsibilities include:
-Moving up and down.
-Opening and closing doors.
-Keeping track of its current floor.
-
-Request Class
-Each elevator request is an instance of the Request class, which includes:
-
-Requested floor.
-Direction (up or down).
-
-Controller Class
-The Controller class is the brain of the system, responsible for:
-
-Handling requests.
-Assigning requests to the appropriate elevator.
-
-Queue concept to be implemented
-
-*/
-//INIT
-// l1,l2,l3
-// f1,f2,f3,f4,f5
-// l1->f1,
-// l2->f5
-// l3->f2;
-
-//ctl -> up f4
-// check for lift are idle and nearest and only 2lifts allowed in one
-// floor[one is for UP and other one is for DOWN]
-// pick that
-/**
- * Someting creative i need to comeup with 1 Floor and 1 Lift
- */
-
 const STATUS = {
   IDLE: "IDLE",
   MOVING: "MOVING",
@@ -119,7 +44,7 @@ function renderLiftControl(floorObj, noOfFloors) {
     upBtn.classList.add(...btnClassList);
     const imgElement = document.createElement("img");
     imgElement.classList.add("w-1/2", "rotate-180", "m-auto");
-    imgElement.src = "/img/down-chevron.svg";
+    imgElement.src = "/src/img/down-chevron.svg";
     imgElement.alt = "Up arrow";
     upBtn.appendChild(imgElement);
     liftControlElement.append(upBtn);
@@ -132,7 +57,7 @@ function renderLiftControl(floorObj, noOfFloors) {
     downBtn.classList.add(...btnClassList);
     const imgElement = document.createElement("img");
     imgElement.classList.add("w-1/2", "m-auto");
-    imgElement.src = "/img/down-chevron.svg";
+    imgElement.src = "/src/img/down-chevron.svg";
     imgElement.alt = "Down arrow";
     downBtn.appendChild(imgElement);
     liftControlElement.append(downBtn);
@@ -268,7 +193,6 @@ function renderLiftMovement({
   const destination = document.getElementById(toFloorName);
   const sourceRect = source.getBoundingClientRect();
   const destinationRect = destination.getBoundingClientRect();
-
   const movingLift = document.getElementById(liftNo);
   const movingLiftRect = movingLift.getBoundingClientRect();
   movingLift.style.position = "absolute";
@@ -320,7 +244,6 @@ class Lift {
     }
   }
   open() {
-    console.log("Opening the door");
     setTimeout(() => {
       document.getElementById(this.liftNo).classList.add("slide");
     }, 0);
@@ -391,8 +314,7 @@ class LiftController {
       (lift) =>
         lift.status === STATUS.MOVING &&
         lift.direction === direction &&
-        lift.floor === floorNumber &&
-        lift.floor !== 1
+        lift.floor === floorNumber
     );
     if (movingLiftToSameFloor) {
       return null;
