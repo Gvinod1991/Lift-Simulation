@@ -45,7 +45,7 @@ function renderLiftControl(floorObj, noOfFloors) {
     upBtn.classList.add(...btnClassList);
     const imgElement = document.createElement("img");
     imgElement.classList.add("w-1/2", "rotate-180", "m-auto");
-    imgElement.src = "/src/img/down-chevron.svg";
+    imgElement.src = "/img/down-chevron.svg";
     imgElement.alt = "Up arrow";
     upBtn.appendChild(imgElement);
     liftControlElement.append(upBtn);
@@ -58,7 +58,7 @@ function renderLiftControl(floorObj, noOfFloors) {
     downBtn.classList.add(...btnClassList);
     const imgElement = document.createElement("img");
     imgElement.classList.add("w-1/2", "m-auto");
-    imgElement.src = "/src/img/down-chevron.svg";
+    imgElement.src = "/img/down-chevron.svg";
     imgElement.alt = "Down arrow";
     downBtn.appendChild(imgElement);
     liftControlElement.append(downBtn);
