@@ -10,6 +10,7 @@ const errorIds = {
   noOfFloors: "no-of-floors-error",
   noOfLifts: "no-of-lifts-error",
 };
+let interval;
 const buildingWrapper = document.getElementById("lifts-wrapper");
 const submitForm = document.getElementById("submit-form");
 const btnClassList = [
@@ -44,7 +45,7 @@ function renderLiftControl(floorObj, noOfFloors) {
     upBtn.classList.add(...btnClassList);
     const imgElement = document.createElement("img");
     imgElement.classList.add("w-1/2", "rotate-180", "m-auto");
-    imgElement.src = "/img/down-chevron.svg";
+    imgElement.src = "/src/img/down-chevron.svg";
     imgElement.alt = "Up arrow";
     upBtn.appendChild(imgElement);
     liftControlElement.append(upBtn);
@@ -57,7 +58,7 @@ function renderLiftControl(floorObj, noOfFloors) {
     downBtn.classList.add(...btnClassList);
     const imgElement = document.createElement("img");
     imgElement.classList.add("w-1/2", "m-auto");
-    imgElement.src = "/img/down-chevron.svg";
+    imgElement.src = "/src/img/down-chevron.svg";
     imgElement.alt = "Down arrow";
     downBtn.appendChild(imgElement);
     liftControlElement.append(downBtn);
@@ -151,6 +152,7 @@ function renderLifts(lifts, liftWrapper) {
 }
 
 submitForm.addEventListener("submit", function (e) {
+  clearInterval(interval);
   e.preventDefault();
   Object.entries(errorIds).map(([key, value]) => {
     document.getElementById(value).innerText = "";
@@ -169,6 +171,7 @@ submitForm.addEventListener("submit", function (e) {
   }
   if (isFormValid) {
     liftController.renderBuilding(noOfFloors, noOfLifts);
+    runScheduler();
   }
 });
 
@@ -290,6 +293,7 @@ class LiftController {
     this.totalLifts = 0;
     this.lifts = [];
     this.floors = [];
+    this.queuedRequests = [];
   }
   getLifts() {
     return this.lifts;
@@ -338,8 +342,40 @@ class LiftController {
   }
   liftRequest(floorNumber, direction) {
     const lift = this.getAvailableLift(floorNumber, direction);
-    lift?.move(direction, floorNumber);
+    if (lift) {
+      lift?.move(direction, floorNumber);
+    } else {
+      this.queuedRequests.push({ direction, floorNumber });
+    }
+  }
+  getQueuedRequests() {
+    return this.queuedRequests;
+  }
+  removeFirstQueueRequest() {
+    const queuedRequests = [...this.queuedRequests];
+    this.queuedRequests = queuedRequests.filter((_, index) => index != 0);
   }
 }
 
 const liftController = new LiftController();
+
+//Check for the queue
+function runScheduler() {
+  interval = setInterval(() => {
+    const liftRequests = liftController.getQueuedRequests();
+    if (liftRequests?.length > 0) {
+      const firstRequestInQueue = liftRequests[0];
+      const lift = liftController.getAvailableLift(
+        firstRequestInQueue.direction,
+        firstRequestInQueue.floorNumber
+      );
+      if (lift) {
+        lift?.move(
+          firstRequestInQueue.direction,
+          firstRequestInQueue.floorNumber
+        );
+        liftController.removeFirstQueueRequest();
+      }
+    }
+  }, 1000);
+}
