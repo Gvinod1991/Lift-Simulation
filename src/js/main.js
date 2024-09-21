@@ -313,14 +313,17 @@ class LiftController {
     }
     renderBuildingAndLifts(this.floors, this.lifts);
   }
-  getAvailableLift(floorNumber, direction) {
+  getMovingLiftToSameFloor(floorNumber, direction) {
     const movingLiftToSameFloor = this.lifts.find(
       (lift) =>
         lift.status === STATUS.MOVING &&
         lift.direction === direction &&
         lift.floor === floorNumber
     );
-    if (movingLiftToSameFloor) {
+    return movingLiftToSameFloor;
+  }
+  getAvailableLift(floorNumber, direction) {
+    if (this.getMovingLiftToSameFloor(floorNumber, direction)) {
       return null;
     }
     const floorDistance = [];
@@ -365,11 +368,15 @@ function runScheduler() {
     const liftRequests = liftController.getQueuedRequests();
     if (liftRequests?.length > 0) {
       const firstRequestInQueue = liftRequests[0];
-      const lift = liftController.getAvailableLift(
-        firstRequestInQueue.direction,
-        firstRequestInQueue.floorNumber
+      const movingLiftToSameFloor = liftController.getMovingLiftToSameFloor(
+        firstRequestInQueue.floorNumber,
+        firstRequestInQueue.direction
       );
-      if (lift) {
+      const lift = liftController.getAvailableLift(
+        firstRequestInQueue.floorNumber,
+        firstRequestInQueue.direction
+      );
+      if (lift && !movingLiftToSameFloor) {
         lift?.move(
           firstRequestInQueue.direction,
           firstRequestInQueue.floorNumber
